@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"net/http"
 
 	"github.com/TechBowl-japan/go-stations/db"
 	"github.com/TechBowl-japan/go-stations/handler/router"
@@ -50,7 +51,8 @@ func realMain() error {
 	// NOTE: 新しいエンドポイントの登録はrouter.NewRouterの内部で行うようにする
 	mux := router.NewRouter(todoDB)
 
-	// TODO: サーバーをlistenする
-
+	// TODO: ここから実装を行う
+	http.ListenAndServe(port, mux)
+	
 	return nil
 }
