@@ -2,8 +2,8 @@ package sta12_test
 
 import (
 	"context"
-	"errors"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 
@@ -66,7 +66,7 @@ func TestStation12(t *testing.T) {
 		},
 		"Subject is empty": {
 			ID:        1,
-			WantError: sqlite3.ErrConstraint,
+			WantError: sqlite3.Error{},
 		},
 		"Description is empty": {
 			ID:      1,
@@ -91,8 +91,18 @@ func TestStation12(t *testing.T) {
 					t.Errorf("予期しないエラーが発生しました: %v", err)
 					return
 				}
+			case sqlite3.Error{}:
+				if reflect.TypeOf(err) != reflect.TypeOf(tc.WantError) {
+					t.Errorf("期待していないエラーの Type です, got = %t, want = %+v", err, tc.WantError)
+					return
+				}
+				if err.(sqlite3.Error).Code != sqlite3.ErrConstraint {
+					t.Errorf("期待していないsqlite3のエラーナンバーです, got = %d, want = %d", err.(sqlite3.Error).Code, sqlite3.ErrConstraint)
+					return
+				}
+				return
 			default:
-				if !errors.As(err, &tc.WantError) {
+				if reflect.TypeOf(err) != reflect.TypeOf(tc.WantError) {
 					t.Errorf("期待していないエラーの Type です, got = %t, want = %+v", err, tc.WantError)
 					return
 				}
